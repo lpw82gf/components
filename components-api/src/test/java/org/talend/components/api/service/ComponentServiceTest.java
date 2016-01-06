@@ -130,13 +130,13 @@ public class ComponentServiceTest extends AbstractComponentTest {
         Date dateLater = new Date();
         dateLater.setTime(dateLater.getTime() + 10000);
 
-        props.setValue(props.userId, "userId");
-        props.setValue(props.integer, 1);
-        props.setValue(props.decimal, 2);
-        props.setValue(props.date, dateNow);
-        props.setValue(props.dateTime, dateNow);
-        props.nestedProps.setValue(props.nestedProps.aGreatProperty, "propPrevious1");
-        props.nestedProps.setValue(props.nestedProps.anotherProp, "propPrevious2");
+        props.userId.setValue("userId");
+        props.integer.setValue(1);
+        props.decimal.setValue(2);
+        props.date.setValue(dateNow);
+        props.dateTime.setValue(dateNow);
+        props.nestedProps.aGreatProperty.setValue("propPrevious1");
+        props.nestedProps.anotherProp.setValue("propPrevious2");
 
         props = (TestComponentProperties) getComponentService().makeFormCancelable(props, "restoreTest");
 
@@ -152,9 +152,9 @@ public class ComponentServiceTest extends AbstractComponentTest {
         form.setValue("date", dateLater);
         form.setValue("dateTime", dateLater);
 
-        assertEquals("userId", props.getValue(props.userId));
-        assertEquals("propPrevious1", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
-        assertEquals(1, props.getIntValue(props.integer));
+        assertEquals("userId", props.userId.getValue());
+        assertEquals("propPrevious1", props.nestedProps.aGreatProperty.getValue());
+        assertEquals(1, props.integer.getIntValue());
         // FIXME - finish this
         // assertEquals(2, props.getDecimalValue(props.decimal));
         // assertEquals(dateNow, props.getCalendarValue(props.date));
@@ -162,8 +162,8 @@ public class ComponentServiceTest extends AbstractComponentTest {
         assertTrue(props.nestedProps == savedNested);
 
         props = (TestComponentProperties) getComponentService().commitFormValues(props, "restoreTest");
-        assertEquals("userIdnew", props.getValue(props.userId));
-        assertEquals("propPrevious1new", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
+        assertEquals("userIdnew", props.userId.getValue());
+        assertEquals("propPrevious1new", props.nestedProps.aGreatProperty.getValue());
     }
 
     @Test

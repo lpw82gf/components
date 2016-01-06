@@ -52,7 +52,7 @@ public class PropertiesTest {
 
         assertEquals("testUser", props.userId.getStringValue());
         assertEquals("testPassword", props.password.getValue());
-        assertEquals("greatness", props.nestedProps.getValue(props.nestedProps.aGreatProperty));
+        assertEquals("greatness", props.nestedProps.aGreatProperty.getValue());
 
     }
 
@@ -93,8 +93,8 @@ public class PropertiesTest {
 
         TestComponentProperties props2 = (TestComponentProperties) new TestComponentProperties("test2").init();
         props2.copyValuesFrom(props);
-        assertEquals(1, props2.getIntValue(props2.getProperty("integer")));
-        assertEquals("User1", props2.getStringValue(props2.getProperty("userId")));
+        assertEquals(1, ((Property) props2.getProperty("integer")).getIntValue());
+        assertEquals("User1", ((Property) props2.getProperty("userId")).getStringValue());
         assertEquals("great1", ((Property) props2.getProperty("nestedProps.aGreatProperty")).getStringValue());
     }
 

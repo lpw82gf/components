@@ -12,8 +12,8 @@
 // ============================================================================
 package org.talend.components.common;
 
-import static org.talend.components.api.properties.PropertyFactory.newProperty;
-import static org.talend.components.api.properties.presentation.Widget.widget;
+import static org.talend.components.api.properties.PropertyFactory.*;
+import static org.talend.components.api.properties.presentation.Widget.*;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.properties.Property;
@@ -55,7 +55,7 @@ public class SchemaProperties extends ComponentProperties {
 
     @Override
     public SchemaElement addChild(SchemaElement row) {
-        Schema s = (Schema) getValue(schema);
+        Schema s = (Schema) schema.getValue();
         SchemaElement root = s.getRoot();
         if (root == null) {
             root = PropertyFactory.newProperty("Root"); //$NON-NLS-1$

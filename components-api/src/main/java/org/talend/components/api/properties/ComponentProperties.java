@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +30,7 @@ import org.talend.components.api.i18n.TranslatableImpl;
 import org.talend.components.api.properties.internal.ComponentPropertiesInternal;
 import org.talend.components.api.properties.presentation.Form;
 import org.talend.components.api.properties.presentation.Widget;
-import org.talend.components.api.schema.Schema;
 import org.talend.components.api.schema.SchemaElement;
-import org.talend.components.api.schema.SchemaFactory;
 import org.talend.daikon.exception.error.CommonErrorCodes;
 import org.talend.daikon.i18n.I18nMessages;
 import org.talend.daikon.security.CryptoHelper;
@@ -319,7 +316,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
                     if (se != null) {
                         properties.add(se);
                         if (se instanceof Property) {
-                            ((Property) se).setComponentProperties(this);
+                            ((Property) se).setValueHolder(internal);
                         }
                         // Do not set the i18N for nested ComponentProperties, they already handle their i18n
                         if (!(se instanceof ComponentProperties)) {
@@ -332,6 +329,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             }
         }
         if (returns != null) {
+            returns.setValueHolder(internal);
             returns.setI18nMessageFormater(getI18nMessageFormater());
             properties.add(returns);
         }
@@ -402,52 +400,12 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         return prop;
     }
 
-    public void setValue(SchemaElement property, Object value) {
-        if (property.getType() == Type.SCHEMA && value instanceof String) {
-            value = SchemaFactory.fromSerialized((String) value);
-        }
-
-        internal.setValue(property, value);
-    }
-
     public void setValue(String property, Object value) {
         SchemaElement p = getProperty(property);
         if (!(p instanceof Property)) {
             throw new IllegalArgumentException("setValue but property: " + property + " is not a Property");
         }
         ((Property) p).setValue(value);
-    }
-
-    public Object getValue(SchemaElement property) {
-        return internal.getValue(property);
-    }
-
-    public boolean getBooleanValue(SchemaElement property) {
-        Boolean value = (Boolean) getValue(property);
-        return value != null && value;
-    }
-
-    public String getStringValue(SchemaElement property) {
-        Object value = getValue(property);
-        if (value != null) {
-            if (value instanceof Schema) {
-                return ((Schema) value).toSerialized();
-            }
-            return value.toString();
-        }
-        return null;
-    }
-
-    public int getIntValue(SchemaElement property) {
-        Integer value = (Integer) getValue(property);
-        if (value == null) {
-            return 0;
-        }
-        return value;
-    }
-
-    public Calendar getCalendarValue(SchemaElement property) {
-        return (Calendar) getValue(property);
     }
 
     /**
@@ -475,8 +433,8 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
             if (se instanceof ComponentProperties) {
                 ((ComponentProperties) se).copyValuesFrom((ComponentProperties) otherSe);
             } else {
-                Object value = props.getValue(otherSe);
-                setValue(se, value);
+                Object value = ((Property) otherSe).getValue();
+                ((Property) se).setValue(value);
             }
         }
 
@@ -796,7 +754,7 @@ public abstract class ComponentProperties extends TranslatableImpl implements Sc
         sb.append("\n" + is + "   Properties:");
         for (SchemaElement prop : getProperties()) {
             sb.append("\n" + prop.toStringIndent(indent + 6));
-            String value = getStringValue(prop);
+            String value = prop instanceof Property ? ((Property) prop).getStringValue() : null;
             if (value != null) {
                 sb.append(" [" + value + "]");
             }
