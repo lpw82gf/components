@@ -30,9 +30,8 @@ public class TSalesforceOutputBulkDefinition extends SalesforceDefinition {
 
     public TSalesforceOutputBulkDefinition() {
         super(COMPONENT_NAME);
-
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 0));
-        setTriggers(new ComponentTrigger(TriggerType.ITERATE, 1, 0), new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0),
+        setConnectors(new ComponentConnector(ConnectorType.FLOW, 1, 0));
+        setTriggers(new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0),
                 new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 

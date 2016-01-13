@@ -34,8 +34,7 @@ public class TSalesforceGetUpdatedDefinition extends SalesforceDefinition {
 
     public TSalesforceGetUpdatedDefinition() {
         super(COMPONENT_NAME);
-
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 1, 1));
+        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 1));
         setTriggers(new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0), new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
