@@ -22,20 +22,17 @@ import org.talend.components.salesforce.SalesforceDefinition;
 
 import aQute.bnd.annotation.component.Component;
 
-@Component(name = Constants.COMPONENT_BEAN_PREFIX
-        + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
+@Component(name = Constants.COMPONENT_BEAN_PREFIX + TSalesforceBulkExecDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
 public class TSalesforceBulkExecDefinition extends SalesforceDefinition {
 
-    public static final String COMPONENT_NAME = "tSalesforceBulkExec"; //$NON-NLS-1$
+    public static final String COMPONENT_NAME = "tSalesforceBulkExecNew"; //$NON-NLS-1$
 
     public TSalesforceBulkExecDefinition() {
         super(COMPONENT_NAME);
 
-        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 0),
-																new ComponentConnector(ConnectorType.MAIN, 0, 1),
-																new ComponentConnector(ConnectorType.REJECT, 0, 1));
-        setTriggers(new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0),
-                new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
+        setConnectors(new ComponentConnector(ConnectorType.FLOW, 0, 0), new ComponentConnector(ConnectorType.MAIN, 0, 1),
+                new ComponentConnector(ConnectorType.REJECT, 0, 1));
+        setTriggers(new ComponentTrigger(TriggerType.SUBJOB_OK, 1, 0), new ComponentTrigger(TriggerType.SUBJOB_ERROR, 1, 0));
     }
 
     @Override
