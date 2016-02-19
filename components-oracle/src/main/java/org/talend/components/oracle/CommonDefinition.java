@@ -10,32 +10,24 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.db.oracle;
-
-import java.io.InputStream;
+package org.talend.components.oracle;
 
 import org.talend.components.api.component.AbstractComponentDefinition;
 import org.talend.components.api.component.ComponentImageType;
-import org.talend.components.api.runtime.ComponentRuntime;
 
-public abstract class OracleDefinition extends AbstractComponentDefinition {
+public abstract class CommonDefinition extends AbstractComponentDefinition {
 
     protected String componentName;
 
-    public OracleDefinition(String componentName) {
-        this.componentName = componentName;
+    public CommonDefinition() {
+        setComponentName();
+        initConnections();
     }
 
-    @Override
-    public String[] getFamilies() {
-        return new String[] { "Databases/Oracle" };
-    }
-
-    @Override
-    public ComponentRuntime createRuntime() {
-        return new OracleRuntime();
-    }
-
+    abstract protected void setComponentName();
+    
+    abstract protected void initConnections();
+    
     @Override
     public String getName() {
         return componentName;
@@ -52,13 +44,7 @@ public abstract class OracleDefinition extends AbstractComponentDefinition {
 
     @Override
     public String getDisplayName() {
-        // FIXME
         return getName();
-    }
-
-    @Override
-    public InputStream getMavenPom() {
-        return this.getClass().getResourceAsStream("/org/talend/components/oracle/pom.xml");
     }
 
 }

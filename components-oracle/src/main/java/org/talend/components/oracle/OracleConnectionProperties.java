@@ -10,32 +10,18 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.db.oracle.toracleinput;
+package org.talend.components.oracle;
 
-import org.talend.components.db.oracle.OracleConnectionProperties;
-import org.talend.daikon.properties.presentation.Form;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+public class OracleConnectionProperties extends DBConnectionProperties {
 
-public class TOracleInputProperties extends OracleConnectionProperties {
-
-    public TOracleInputProperties(@JsonProperty("name") String name) {
+    public OracleConnectionProperties(String name) {
         super(name);
-    }
-
-    @Override
-    public void setupProperties() {
-        super.setupProperties();
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-    }
-
-    @Override
-    public void refreshLayout(Form form) {
-        super.refreshLayout(form);
     }
 
 }

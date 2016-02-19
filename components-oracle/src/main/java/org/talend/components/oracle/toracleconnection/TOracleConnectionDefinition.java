@@ -10,36 +10,47 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.db.oracle.toracleconnection;
+package org.talend.components.oracle.toracleconnection;
+
+import java.io.InputStream;
 
 import org.talend.components.api.Constants;
 import org.talend.components.api.component.ComponentDefinition;
-import org.talend.components.api.component.Connector;
-import org.talend.components.api.component.Connector.ConnectorType;
-import org.talend.components.api.component.Trigger;
-import org.talend.components.api.component.Trigger.TriggerType;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
-import org.talend.components.db.oracle.OracleConnectionProperties;
-import org.talend.components.db.oracle.OracleDefinition;
-import org.talend.components.db.oracle.OracleRuntime;
+import org.talend.components.oracle.DBConnectionDefinition;
+import org.talend.components.oracle.OracleConnectionProperties;
+import org.talend.components.oracle.OracleRuntime;
 import org.talend.daikon.properties.ValidationResult;
 
 import aQute.bnd.annotation.component.Component;
 
 @Component(name = Constants.COMPONENT_BEAN_PREFIX
         + TOracleConnectionDefinition.COMPONENT_NAME, provide = ComponentDefinition.class)
-public class TOracleConnectionDefinition extends OracleDefinition {
+public class TOracleConnectionDefinition extends DBConnectionDefinition {
 
-    public static final String COMPONENT_NAME = "tOracleConnectionNew"; //$NON-NLS-1$
-
-    public TOracleConnectionDefinition() {
-        super(COMPONENT_NAME);
-        setConnectors(new Connector(ConnectorType.FLOW, 0, 0));
-        setTriggers(new Trigger(TriggerType.ITERATE, 1, 0), new Trigger(TriggerType.SUBJOB_OK, 1, 0),
-                new Trigger(TriggerType.SUBJOB_ERROR, 1, 0));
+    public static final String COMPONENT_NAME = "tOracleConnectionNew";
+    
+    @Override
+    protected void setComponentName() {
+        this.componentName = COMPONENT_NAME;
+    }
+    
+    @Override
+    public String[] getFamilies() {
+        return new String[] { "Databases/Oracle" };
+    }
+    
+    @Override
+    public Class<?> getPropertyClass() {
+        return OracleConnectionProperties.class;
     }
 
+    @Override
+    public InputStream getMavenPom() {
+        return this.getClass().getResourceAsStream("/org/talend/components/oracle/pom.xml");
+    }
+    
     @Override
     public ComponentRuntime createRuntime() {
         return new OracleRuntime() {
@@ -52,18 +63,13 @@ public class TOracleConnectionDefinition extends OracleDefinition {
                     throw new Exception(result.getMessage());
                 }
             }
+            
+            @Override
+            public void inputEnd() throws Exception {
+                //do nothing
+            }
 
         };
-    }
-
-    @Override
-    public boolean isStartable() {
-        return true;
-    }
-
-    @Override
-    public Class<?> getPropertyClass() {
-        return OracleConnectionProperties.class;
     }
 
 }

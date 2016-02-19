@@ -10,14 +10,13 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.db;
+package org.talend.components.oracle;
 
 import static org.talend.daikon.properties.PropertyFactory.newBoolean;
 import static org.talend.daikon.properties.PropertyFactory.newString;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.UserPasswordProperties;
-import org.talend.components.db.oracle.OracleRuntime;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;

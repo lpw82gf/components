@@ -10,19 +10,22 @@
 // 9 rue Pages 92150 Suresnes, France
 //
 // ============================================================================
-package org.talend.components.db.oracle;
+package org.talend.components.oracle;
 
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.api.runtime.ComponentRuntime;
 import org.talend.components.api.runtime.ComponentRuntimeContainer;
 import org.talend.components.api.service.ComponentService;
-import org.talend.components.db.oracle.toracleinput.TOracleInputProperties;
+import org.talend.components.oracle.toracleinput.TOracleInputProperties;
 import org.talend.daikon.NamedThing;
 import org.talend.daikon.properties.PropertyFactory;
 import org.talend.daikon.properties.ValidationResult;
@@ -31,8 +34,6 @@ import org.talend.daikon.schema.SchemaElement;
 import org.talend.daikon.schema.SchemaFactory;
 
 public class OracleRuntime extends ComponentRuntime {
-
-    private static final Logger LOG = LoggerFactory.getLogger(OracleRuntime.class);
 
     protected ComponentService componentService;
 
@@ -43,6 +44,13 @@ public class OracleRuntime extends ComponentRuntime {
     protected Map<String, SchemaElement> fieldMap;
 
     protected List<SchemaElement> fieldList;
+    
+    //oracle special vars
+    private Connection conn = null;
+    
+    private String dbschema = null;
+    
+    private ResultSet resultSet = null;
 
     public OracleRuntime() {
         
@@ -68,11 +76,31 @@ public class OracleRuntime extends ComponentRuntime {
     }
 
     @Override
-    public void connect(ComponentProperties p) {
-        OracleConnectionProperties properties = (OracleConnectionProperties) p;
-        final OracleConnectionProperties finalProps = properties;
+    public void connect(ComponentProperties p) throws SQLException {
+        properties = p;
         
-        //TODO do connect
+        OracleConnectionProperties properties = (OracleConnectionProperties) p;
+        
+        String host = properties.host.getStringValue();
+        String port = properties.port.getStringValue();
+        String dbname = properties.port.getStringValue();
+        String parameters = properties.jdbcparameter.getStringValue();
+        
+        String username = properties.userPassword.userId.getStringValue();
+        String password = properties.userPassword.password.getStringValue();
+        
+        boolean autocommit = properties.autocommit.getBooleanValue();
+        
+        StringBuilder url = new StringBuilder();
+        url.append("jdbc:oracle:thin:@").append(host).append(":").append(port).append(":").append(dbname);
+        if(parameters!=null) {
+            url.append("?").append(parameters);
+        }
+        
+        conn = java.sql.DriverManager.getConnection(url.toString(),username,password);
+        conn.setAutoCommit(autocommit);
+        
+        dbschema = properties.dbschema.getStringValue();
     }
 
     @Override
@@ -101,12 +129,11 @@ public class OracleRuntime extends ComponentRuntime {
         return schema;
     }
 
-    protected void commonBegin(ComponentProperties props) {
-        properties = props;
+    protected void commonBegin(ComponentProperties props) throws SQLException {
+        connect(props);
 
-        connect(null);
-
-        Schema schema = null;
+        TOracleInputProperties sprops = (TOracleInputProperties) props;
+        Schema schema = CommonUtils.getSchema(sprops.schema);
         
         fieldMap = schema.getRoot().getChildMap();
         fieldList = schema.getRoot().getChildren();
@@ -114,19 +141,35 @@ public class OracleRuntime extends ComponentRuntime {
 
     @Override
     public void inputBegin(ComponentProperties props) throws Exception {
+        commonBegin(props);
+        
         TOracleInputProperties sprops = (TOracleInputProperties) props;
         
-        commonBegin(props);
+        Statement statement = conn.createStatement();
+        resultSet = statement.executeQuery(sprops.sql.getStringValue());
     }
 
     @Override
     public Map<String, Object> inputRow() throws Exception {
-        return null;
+        if(!resultSet.next()) {
+            return null;
+        }
+        
+        Map<String,Object> row = new HashMap<String,Object>();
+        
+        for(int i=0;i<fieldList.size();i++) {
+            SchemaElement element = fieldList.get(i);
+            //TODO fix the type mapping
+            row.put(element.getDisplayName(), resultSet.getString(i));
+        }
+        return row;
     }
 
     @Override
     public void inputEnd() throws Exception {
-        
+        if(conn!=null) {
+            conn.close();
+        }
     }
 
     @Override

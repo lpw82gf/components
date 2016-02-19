@@ -12,22 +12,13 @@
 // ============================================================================
 package org.talend.components.db.oracle;
 
-import org.talend.components.db.DBConnectionProperties;
-import org.talend.daikon.properties.ValidationResult;
+import org.junit.Test;
 
-public class OracleConnectionProperties extends DBConnectionProperties {
+public class OracleComponentTestIT {
 
-    public OracleConnectionProperties(String name) {
-        super(name);
-    }
-
-    @Override
-    public void setupLayout() {
-        super.setupLayout();
-    }
-
-    public ValidationResult validateTestConnection() throws Exception {
-        return super.validateTestConnection();
+    @Test
+    public void testExample() {
+        
     }
 
 }
