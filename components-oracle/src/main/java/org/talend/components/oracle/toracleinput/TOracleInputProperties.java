@@ -16,14 +16,14 @@ import static org.talend.daikon.properties.PropertyFactory.newString;
 
 import org.talend.components.api.properties.ComponentPropertyFactory;
 import org.talend.components.common.SchemaProperties;
-import org.talend.components.oracle.OracleConnectionProperties;
+import org.talend.components.oracle.OracleModuleProperties;
 import org.talend.daikon.properties.Property;
 import org.talend.daikon.properties.presentation.Form;
 import org.talend.daikon.schema.SchemaElement;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class TOracleInputProperties extends OracleConnectionProperties {
+public class TOracleInputProperties extends OracleModuleProperties {
 
     public Property tablename = newString("tablename");
     
@@ -43,16 +43,19 @@ public class TOracleInputProperties extends OracleConnectionProperties {
         mainForm.addRow(tablename);
         mainForm.addColumn(schema.getForm(Form.REFERENCE));
         mainForm.addRow(sql);
-        
-        getForm(Form.ADVANCED).getWidget(this.autocommit.getName()).setVisible(false);
     }
-
+    
     @Override
     public void setupProperties() {
         super.setupProperties();
         
         returns = ComponentPropertyFactory.newReturnsProperty();
         ComponentPropertyFactory.newReturnProperty(returns, SchemaElement.Type.INT, "NB_LINE");
+    }
+
+    @Override
+    public void refreshLayout(Form form) {
+        super.refreshLayout(form);
     }
     
 }

@@ -13,13 +13,17 @@
 package org.talend.components.oracle;
 
 import static org.talend.daikon.properties.PropertyFactory.newBoolean;
+import static org.talend.daikon.properties.PropertyFactory.newEnum;
 import static org.talend.daikon.properties.PropertyFactory.newString;
+import static org.talend.daikon.properties.presentation.Widget.widget;
 
 import org.talend.components.api.properties.ComponentProperties;
 import org.talend.components.common.UserPasswordProperties;
+import org.talend.components.oracle.toracleconnection.TOracleConnectionDefinition;
 import org.talend.daikon.properties.Property;
-import org.talend.daikon.properties.ValidationResult;
 import org.talend.daikon.properties.presentation.Form;
+import org.talend.daikon.properties.presentation.Widget;
+import org.talend.daikon.properties.presentation.Widget.WidgetType;
 
 public class DBConnectionProperties extends ComponentProperties {
     
@@ -35,6 +39,8 @@ public class DBConnectionProperties extends ComponentProperties {
     
     public Property jdbcparameter = newString("jdbcparameter");
 
+    public Property referencedComponentId = newEnum("referencedComponentId");
+    
     //advanced setting start
     public Property autocommit = newBoolean("autocommit");
     
@@ -46,7 +52,7 @@ public class DBConnectionProperties extends ComponentProperties {
     public void setupLayout() {
         super.setupLayout();
 
-        Form mainForm = new Form(this, Form.MAIN);
+        Form mainForm = CommonUtils.addForm(this, Form.MAIN);
         
         mainForm.addRow(host);
         mainForm.addColumn(port);
@@ -58,18 +64,48 @@ public class DBConnectionProperties extends ComponentProperties {
         
         mainForm.addRow(jdbcparameter);
 
-        Form advancedForm = new Form(this, Form.ADVANCED);
+        Form advancedForm = CommonUtils.addForm(this, Form.ADVANCED);
         advancedForm.addRow(autocommit);
+        
+        //only store it, will use it later
+        Form refForm = CommonUtils.addForm(this, Form.REFERENCE);
+        Widget compListWidget = widget(referencedComponentId).setWidgetType(WidgetType.COMPONENT_REFERENCE);
+        compListWidget.setReferencedComponentName(getReferencedComponentName());
+        refForm.addRow(compListWidget);
+        refForm.addRow(mainForm);
     }
-
-    public ValidationResult validateTestConnection() throws Exception {
-        OracleRuntime conn = new OracleRuntime();
-        return conn.connectWithResult(this);
+    
+    protected String getReferencedComponentName() {
+        return null;
+    }
+    
+    public void afterReferencedComponentId() {
+        refreshLayout(getForm(Form.MAIN));
     }
 
     @Override
     public void refreshLayout(Form form) {
         super.refreshLayout(form);
+        
+        if (form.getName().equals(Form.MAIN)) {
+            String id = referencedComponentId.getStringValue();
+            if(id == null || !id.startsWith(TOracleConnectionDefinition.COMPONENT_NAME)) {
+                form.getWidget(host.getName()).setVisible(true);
+                form.getWidget(port.getName()).setVisible(true);
+                form.getWidget(database.getName()).setVisible(true);
+                form.getWidget(dbschema.getName()).setVisible(true);
+                form.getWidget(userPassword.getName()).setVisible(true);
+                form.getWidget(jdbcparameter.getName()).setVisible(true);
+                return;
+            }
+            
+            form.getWidget(host.getName()).setVisible(false);
+            form.getWidget(port.getName()).setVisible(false);
+            form.getWidget(database.getName()).setVisible(false);
+            form.getWidget(dbschema.getName()).setVisible(false);
+            form.getWidget(userPassword.getName()).setVisible(false);
+            form.getWidget(jdbcparameter.getName()).setVisible(false);
+        }
     }
 
 }

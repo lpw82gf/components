@@ -12,22 +12,23 @@
 // ============================================================================
 package org.talend.components.oracle;
 
-import org.talend.components.oracle.toracleconnection.TOracleConnectionDefinition;
+import org.talend.components.api.properties.ComponentProperties;
+import org.talend.daikon.properties.presentation.Form;
 
+public class OracleModuleProperties extends ComponentProperties {
 
-public class OracleConnectionProperties extends DBConnectionProperties {
-
-    public OracleConnectionProperties(String name) {
+    public OracleConnectionProperties connection = new OracleConnectionProperties("connection");
+    
+    public OracleModuleProperties(String name) {
         super(name);
     }
 
     @Override
     public void setupLayout() {
         super.setupLayout();
-    }
-    
-    protected String getReferencedComponentName() {
-        return TOracleConnectionDefinition.COMPONENT_NAME;
+        
+        Form mainForm = CommonUtils.addForm(this, Form.MAIN);
+        mainForm.addRow(connection.getForm(Form.REFERENCE));
     }
 
 }
